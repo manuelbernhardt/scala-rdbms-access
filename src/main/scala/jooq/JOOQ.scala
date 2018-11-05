@@ -93,9 +93,8 @@ object JOOQ extends App {
     sql
       .update(RECEIVABLE)
       .set(RECEIVABLE.PRICE, newPrice.bigDecimal)
-      .where(
-        RECEIVABLE.CUSTOMER_ID.eq("bar1")
-          .and(RECEIVABLE.VERSION.eq(0))
+      .where(RECEIVABLE.CUSTOMER_ID.eq("bar1"))
+      .and(RECEIVABLE.VERSION.eq(0)
       ).execute()
   }
 
