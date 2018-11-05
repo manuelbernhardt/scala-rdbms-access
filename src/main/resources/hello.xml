@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.7.0.xsd">
+    <jdbc>
+        <driver>org.h2.Driver</driver>
+        <url>jdbc:h2:mem:hello</url>
+        <user>user</user>
+        <password>pass</password>
+    </jdbc>
+    <generator>
+        <name>org.jooq.codegen.ScalaGenerator</name>
+        <database>
+            <name>org.jooq.meta.h2.H2Database</name>
+            <inputSchema>PUBLIC</inputSchema>
+            <includes>.*</includes>
+        </database>
+        <target>
+            <packageName>jooq.generated</packageName>
+            <directory>src/main/scala</directory>
+        </target>
+    </generator>
+</configuration>
