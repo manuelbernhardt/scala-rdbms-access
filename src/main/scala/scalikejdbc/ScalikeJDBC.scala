@@ -107,6 +107,10 @@ object ScalikeJDBC extends App {
     println("Update failed!")
   }
 
+  // SELECT FOR UPDATE
+
+  // not supported
+
   //
   // CRUD
   //

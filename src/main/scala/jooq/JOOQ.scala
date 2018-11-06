@@ -122,6 +122,24 @@ object JOOQ extends App {
     println("Update failed!")
   }
 
+  // locking example (SELECT FOR UPDATE)
+  transaction { sql =>
+    val receivable = sql
+      .selectFrom(RECEIVABLE)
+      .where(RECEIVABLE.ORDER_ID.eq("foo1"))
+      .forUpdate()
+      .fetchOne()
+
+    // the record is now locked, i.e. it can only be updated within this transaction
+    // here comes the business logic
+    val newPrice = receivable.getPrice.add(BigDecimal(10).bigDecimal)
+
+    sql
+      .update(RECEIVABLE)
+      .set(RECEIVABLE.PRICE, newPrice)
+      .where(RECEIVABLE.ID.eq(receivable.getId))
+      .execute()
+  }
 
   //
   // CRUD
