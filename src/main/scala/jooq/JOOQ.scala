@@ -110,8 +110,7 @@ object JOOQ extends App {
       .set(RECEIVABLE.PRICE, newPrice.bigDecimal)
       .set(RECEIVABLE.VERSION, new Integer(bar1Receivable.getVersion + 1))
       .where(RECEIVABLE.CUSTOMER_ID.eq("bar1"))
-      .and(RECEIVABLE.VERSION.eq(bar1Receivable.getVersion)
-      )
+      .and(RECEIVABLE.VERSION.eq(bar1Receivable.getVersion))
       .execute()
   }
 
@@ -139,6 +138,16 @@ object JOOQ extends App {
       .set(RECEIVABLE.PRICE, newPrice)
       .where(RECEIVABLE.ID.eq(receivable.getId))
       .execute()
+  }
+
+  // batch
+
+  transaction { sql =>
+    sql.batch(
+      sql.insertInto(RECEIVABLE, RECEIVABLE.ORDER_ID, RECEIVABLE.PRICE, RECEIVABLE.CUSTOMER_ID).values("foo4", BigDecimal(142.23), "bar4"),
+      sql.insertInto(RECEIVABLE, RECEIVABLE.ORDER_ID, RECEIVABLE.PRICE, RECEIVABLE.CUSTOMER_ID).values("foo5", BigDecimal(144.23), "bar5"),
+      sql.insertInto(RECEIVABLE, RECEIVABLE.ORDER_ID, RECEIVABLE.PRICE, RECEIVABLE.CUSTOMER_ID).values("foo6", BigDecimal(146.23), "bar6")
+    )
   }
 
   //

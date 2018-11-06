@@ -111,6 +111,10 @@ object ScalikeJDBC extends App {
 
   // not supported
 
+  // batch
+
+  // works only in SQL plain SQL, see http://scalikejdbc.org/documentation/operations.html
+
   //
   // CRUD
   //
