@@ -13,6 +13,9 @@
             <inputSchema>PUBLIC</inputSchema>
             <includes>.*</includes>
         </database>
+        <generate>
+            <daos>true</daos>
+        </generate>
         <target>
             <packageName>jooq.generated</packageName>
             <directory>src/main/scala</directory>

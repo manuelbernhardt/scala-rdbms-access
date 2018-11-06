@@ -2,8 +2,9 @@ package jooq
 
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import JOOQDatabaseAccess._
+import jooq.generated.tables.daos.ReceivableDao
 import jooq.generated.tables.records.ReceivableRecord
-import org.jooq.Result
+import org.jooq.{Result, SQLDialect}
 import org.jooq.codegen.GenerationTool
 
 /**
@@ -76,6 +77,20 @@ object JOOQ extends App {
 
   println(cheapest)
 
+  // custom fetching
+  case class Custom(price: java.math.BigDecimal)
+
+  val customFoo = query { sql =>
+    sql
+      .select(RECEIVABLE.PRICE)
+      .from(RECEIVABLE)
+      .where(RECEIVABLE.CUSTOMER_ID.eq("bar1"))
+      .fetchInto(classOf[Custom])
+  }
+
+  println(customFoo)
+
+
   // optimistic locking example
 
   val bar1Receivable: ReceivableRecord = query { sql =>
@@ -93,9 +108,11 @@ object JOOQ extends App {
     sql
       .update(RECEIVABLE)
       .set(RECEIVABLE.PRICE, newPrice.bigDecimal)
+      .set(RECEIVABLE.VERSION, new Integer(bar1Receivable.getVersion + 1))
       .where(RECEIVABLE.CUSTOMER_ID.eq("bar1"))
-      .and(RECEIVABLE.VERSION.eq(0)
-      ).execute()
+      .and(RECEIVABLE.VERSION.eq(bar1Receivable.getVersion)
+      )
+      .execute()
   }
 
   if (updateResult == 1) {
@@ -103,6 +120,46 @@ object JOOQ extends App {
     println(s"Updated successful")
   } else {
     println("Update failed!")
+  }
+
+
+  //
+  // CRUD
+  //
+
+  import org.jooq.impl.DefaultConfiguration
+
+  // Definition
+
+  val configuration = new DefaultConfiguration().set(ds.getConnection).set(SQLDialect.H2)
+  val receivableDAO = new ReceivableDao(configuration)
+
+  // Create
+  transaction { sql =>
+    val newReceivable = sql.newRecord(RECEIVABLE)
+    newReceivable.setPrice(BigDecimal(10))
+    newReceivable.setCustomerId("bar3")
+    newReceivable.setOrderId("foo3")
+    newReceivable.store()
+  }
+
+  // Finders
+
+  val receivableById = receivableDAO.findById(0)
+  val receivableByCustomer = receivableDAO.fetchByCustomerId("bar3").get(0)
+
+  println(receivableByCustomer)
+
+  transaction { sql =>
+
+    val receivable = sql.fetchOne(RECEIVABLE, RECEIVABLE.ID.eq(receivableByCustomer.getId))
+
+    // Update
+    receivable.setPrice(BigDecimal(10000))
+    receivable.store()
+
+    // Delete
+    receivable.delete()
   }
 
 }

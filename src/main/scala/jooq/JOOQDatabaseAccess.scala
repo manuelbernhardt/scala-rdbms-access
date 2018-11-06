@@ -13,14 +13,14 @@ import scala.util.control.ControlThrowable
 
     def query[A](block: DSLContext => A)(implicit ds: DataSource): A = {
       JOOQDatabaseAccess.withConnection(ds, autocommit = true) { connection =>
-        val sql = DSL.using(connection, SQLDialect.POSTGRES_10)
+        val sql = DSL.using(connection, SQLDialect.H2)
         block(sql)
       }
     }
 
     def transaction[A](block: DSLContext => A)(implicit ds: DataSource): A = {
       JOOQDatabaseAccess.withTransaction(ds) { connection =>
-        val sql = DSL.using(connection, SQLDialect.POSTGRES_10)
+        val sql = DSL.using(connection, SQLDialect.H2)
         block(sql)
       }
     }

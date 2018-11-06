@@ -107,6 +107,39 @@ object ScalikeJDBC extends App {
     println("Update failed!")
   }
 
+  //
+  // CRUD
+  //
+
+
+  import skinny.orm._, feature._
+  import org.joda.time._
+
+  // Definition
+
+  sql"create table member (id serial, name varchar(64), created_at timestamp)".execute.apply()
+
+  case class Member(id: Long, name: Option[String], createdAt: DateTime)
+  object Member extends SkinnyCRUDMapper[Member] {
+    override lazy val defaultAlias = createAlias("m")
+    override def extract(rs: WrappedResultSet, n: ResultName[Member]): Member = new Member(
+      id        = rs.get(n.id),
+      name      = rs.get(n.name),
+      createdAt = rs.get(n.createdAt))
+  }
+
+  // create
+  Member.createWithAttributes('name -> "Alice", 'createdAt -> DateTime.now)
+
+  // finders
+  val member: Option[Member] = Member.findById(1)
+  println(member)
+
+  // update
+  Member.updateById(1).withAttributes('name -> "Bob")
+
+  // delete
+  Member.deleteById(1)
 
 }
 
